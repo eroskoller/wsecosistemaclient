@@ -113,4 +113,36 @@ public class SqlStatic {
             + " and der.leg_st_codigo = '020'"
             + " and (der_ch_statusintegracao is null or der_ch_statusintegracao = 0 or der_ch_statusintegracao = 1 or der_ch_statusintegracao = 2)"
             + " order by 1";
+    
+    
+    public static String SQLECOSISTEMAS =
+            "select req.req_st_codigo, "
+            + "       der.exa_st_codigo, "
+            + "       req.req_st_codigoalt, "
+            + "       udp.udp_st_codigo, "
+            + "       edp.edp_st_codigo, "
+            + "       req.uni_st_codigo, "
+            + "       der.der_in_flag, "
+            + "       der.leg_st_codigo, "
+            + "       der.der_ch_statusintegracao, "
+            + "       der.seq_st_codigo "
+            + "  from lab_requisicao        req, "
+            + "       lab_detalherequisicao der, "
+            + "       lab_unidadedepara     udp, "
+            + "       lab_examedepara       edp, "
+            + "       lab_sistema           sis "
+            + " where req.req_st_codigo = der.req_st_codigo "
+            + "   and udp.sis_st_codigo = sis.sis_st_codigo "
+            + "   and udp.uni_st_codigo = der.uni_st_codigo "
+            + "   and edp.sis_st_codigo = sis.sis_st_codigo "
+            + "   and edp.exa_st_codigo = der.exa_st_codigo "
+            + "   and edp.seq_st_codigo = der.seq_st_codigo "
+            + "   and udp.uni_st_codigo = sis.uni_st_codigo "
+            + "   and der.sis_st_codigo = sis.sis_st_codigo "
+            + "   and req.req_dt_cadastro >= trunc(sysdate) - 5 "
+            + "   and sis.sis_st_empresa = 'ECOSISTEMAS' "
+            + "   and der.uni_st_codigo = sis.uni_st_codigo "
+            + "   and (der_ch_statusintegracao <> 9 or der_ch_statusintegracao is null) "
+            + " order by 4,1 ";
+
 }

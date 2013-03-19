@@ -344,6 +344,8 @@ public class LabDetalheRequisicao  implements Serializable {
     @Transient
     private Character  exuChObrigaMaterial;
     
+    @Column(name = "DER_CH_STATUSINTEGRACAO")
+    private Integer derChStatusIntegracao;
     
     
     @Transient
@@ -1488,6 +1490,15 @@ public class LabDetalheRequisicao  implements Serializable {
         this.derHrRecLaudo = derHrRecLaudo;
     }
 
+    public Integer getDerChStatusIntegracao() {
+        return derChStatusIntegracao;
+    }
+
+    public void setDerChStatusIntegracao(Integer derChStatusIntegracao) {
+        this.derChStatusIntegracao = derChStatusIntegracao;
+    }
+
+    
     
     
 

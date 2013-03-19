@@ -1,5 +1,8 @@
 
 import br.com.dasa.wsecosistemasclient.EcoSistemas;
+import br.com.dasa.wsecosistemasclient.EcosistemasSqlDao;
+import br.com.dasa.wsecosistemasclient.RetornoStatus;
+import java.math.BigDecimal;
 
 /*
  * To change this template, choose Tools | Templates
@@ -14,8 +17,10 @@ public class TesteMarcos {
 
     public static void main(String[] args) {
         
-        EcoSistemas eco = new EcoSistemas();
+        RetornoStatus retornoStatus = new RetornoStatus("1349515493", "HEM","01", "", "", "", BigDecimal.ZERO, "", BigDecimal.ONE, "01", Boolean.TRUE, "");
+
+        EcosistemasSqlDao.updateEnviados(retornoStatus);
         
-        eco.criaSenha("1234567890");
+        
     }
 }

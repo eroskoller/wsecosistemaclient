@@ -20,11 +20,16 @@ public class RetornoStatus {
     private String edpStCodigo;
     private String uniStCodigo;
     private BigDecimal derInFlag;
+    private String legStCodigo;
+    private BigDecimal derChStatusIntegracao;
+    private String seqStCodigo;
+    private Boolean sucesso;
+    private String tipoRetorno;
 
     public RetornoStatus() {
     }
 
-    public RetornoStatus(String reqStCodigo, String exaStCodigo, String reqStCodigoAlt, String updStCodigo, String edpStCodigo, String uniStCodigo, BigDecimal derInFlag) {
+    public RetornoStatus(String reqStCodigo, String exaStCodigo, String reqStCodigoAlt, String updStCodigo, String edpStCodigo, String uniStCodigo, BigDecimal derInFlag, String legStCodigo, BigDecimal derChStatusIntegracao, String seqStCodigo, Boolean sucesso, String tipoRetorno) {
         this.reqStCodigo = reqStCodigo;
         this.exaStCodigo = exaStCodigo;
         this.reqStCodigoAlt = reqStCodigoAlt;
@@ -32,6 +37,11 @@ public class RetornoStatus {
         this.edpStCodigo = edpStCodigo;
         this.uniStCodigo = uniStCodigo;
         this.derInFlag = derInFlag;
+        this.legStCodigo = legStCodigo;
+        this.derChStatusIntegracao = derChStatusIntegracao;
+        this.seqStCodigo = seqStCodigo;
+        this.sucesso = sucesso;
+        this.tipoRetorno = tipoRetorno;
     }
 
     public String getReqStCodigo() {
@@ -90,5 +100,50 @@ public class RetornoStatus {
         this.derInFlag = derInFlag;
     }
 
-    
+    public String getLegStCodigo() {
+        return legStCodigo;
+    }
+
+    public void setLegStCodigo(String legStCodigo) {
+        this.legStCodigo = legStCodigo;
+    }
+
+    public BigDecimal getDerChStatusIntegracao() {
+        return derChStatusIntegracao;
+    }
+
+    public void setDerChStatusIntegracao(BigDecimal derChStatusIntegracao) {
+        this.derChStatusIntegracao = derChStatusIntegracao;
+    }
+
+    public String getSeqStCodigo() {
+        return seqStCodigo;
+    }
+
+    public void setSeqStCodigo(String seqStCodigo) {
+        this.seqStCodigo = seqStCodigo;
+    }
+
+    public Boolean getSucesso() {
+        return sucesso;
+    }
+
+    public void setSucesso(Boolean sucesso) {
+        this.sucesso = sucesso;
+    }
+
+    public String getTipoRetorno() {
+        return tipoRetorno;
+    }
+
+    public void setTipoRetorno(String tipoRetorno) {
+        this.tipoRetorno = tipoRetorno;
+    }
+
+    @Override
+    public String toString() {
+        return "RetornoStatus{" + "reqStCodigo=" + reqStCodigo + ", exaStCodigo=" + exaStCodigo + ", reqStCodigoAlt=" + reqStCodigoAlt + ", updStCodigo=" + updStCodigo + ", edpStCodigo=" + edpStCodigo + ", uniStCodigo=" + uniStCodigo + ", derInFlag=" + derInFlag + ", legStCodigo=" + legStCodigo + ", derChStatusIntegracao=" + derChStatusIntegracao + ", seqStCodigo=" + seqStCodigo + ", sucesso=" + sucesso + ", tipoRetorno=" + tipoRetorno + '}';
+    }
+
+        
 }

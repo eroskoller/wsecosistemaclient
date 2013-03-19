@@ -6,6 +6,7 @@ package br.com.dasa.wsecosistemasclient;
 
 import br.com.dasa.hibernate.entities.LabSistema;
 import br.com.dasa.hibernate.utils.OracleHelper;
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 import org.tempuri.RepassarResultado;
@@ -21,93 +22,59 @@ public class EcoSistemas {
     
     public void sendToEcosistemas() {
 
-        List<LabSistema> sistema = OracleHelper.grabSistema("ECOSISTEMAS", "DEFAULT");
+        System.out.println("Buscando informações....");
+        List<RetornoStatus> listRetornoStatus = EcosistemasSqlDao.grabRegistosStatus("DEFAULT");
 
-        if (sistema != null) {
-            for (LabSistema labSistema : sistema) {
-                System.out.println("Lista de Sistemas/Unidade  - Triagem: " + labSistema.getSisStCodigo() + "/" + labSistema.getUniStCodigo().getUniStCodigo());
-                List<RetornoStatus> listRetornoStatus = EcosistemasSqlDao.grabRegistosStatus(labSistema.getUniStCodigo().getUniStCodigo(), SqlStatic.TRIAGEM, "DEFAULT");
+        if (listRetornoStatus != null) {
+            RepassarResultadoService service = new RepassarResultadoService();
+            RepassarResultadoServiceSoap port = service.getRepassarResultadoServiceSoap();
 
-                if (listRetornoStatus != null) {
+            for (RetornoStatus retornoStatus : listRetornoStatus) {
+                String laudo = "";
+                System.out.println("requisicao: " + retornoStatus.getReqStCodigo());
 
-                    RepassarResultadoService service = new RepassarResultadoService();
-                    RepassarResultadoServiceSoap port = service.getRepassarResultadoServiceSoap();
+                if (retornoStatus.getLegStCodigo().equals("002") && retornoStatus.getDerChStatusIntegracao().intValue() == 0) {
+                    retornoStatus.setTipoRetorno("PL");
+                    retornoStatus.setSucesso(true);
+                }
+                if ((retornoStatus.getLegStCodigo().equals("003") || retornoStatus.getLegStCodigo().equals("004"))
+                        && retornoStatus.getDerChStatusIntegracao().intValue() == 0) {
+                    retornoStatus.setTipoRetorno("EA");
+                    retornoStatus.setSucesso(true);
+                }
+                if (retornoStatus.getLegStCodigo().equals("013") && (retornoStatus.getDerChStatusIntegracao().intValue() == 0 || retornoStatus.getDerChStatusIntegracao().intValue() == 1)) {
+                    retornoStatus.setTipoRetorno("CA");
+                    retornoStatus.setSucesso(true);
+                }
+                if (retornoStatus.getLegStCodigo().equals("020") && (retornoStatus.getDerChStatusIntegracao().intValue() == 0 || retornoStatus.getDerChStatusIntegracao().intValue() == 1)) {
+                    retornoStatus.setTipoRetorno("NC");
+                    retornoStatus.setSucesso(true);
+                }
+                if (retornoStatus.getLegStCodigo().equals("011") || retornoStatus.getLegStCodigo().equals("016")) {
+                    laudo = "http://tmlab11.dasa.com.br/cgi/tmlabcgi.exe?req=" + retornoStatus.getReqStCodigo() + "&senha=" + criaSenha(retornoStatus.getReqStCodigo());
 
-                    for (RetornoStatus retornoStatus : listRetornoStatus) {
-                        try {
-                            port.repassarResultado(retornoStatus.getUpdStCodigo(), retornoStatus.getReqStCodigoAlt(), "EA", retornoStatus.getEdpStCodigo(), "", retornoStatus.getReqStCodigo(), "");
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-
+                    if (retornoStatus.getDerInFlag().intValue() > 1) {
+                        retornoStatus.setTipoRetorno("LA");
+                        retornoStatus.setSucesso(true);
+                    } else {
+                        retornoStatus.setTipoRetorno("AL");
+                        retornoStatus.setSucesso(true);
                     }
                 }
+                System.out.println("laudo: " + laudo);
+                System.out.println("Situacao: " + retornoStatus.getTipoRetorno());
 
-                System.out.println("Lista de Sistemas/Unidade  - Nova Coleta: " + labSistema.getSisStCodigo() + "/" + labSistema.getUniStCodigo().getUniStCodigo());
-                listRetornoStatus = EcosistemasSqlDao.grabRegistosStatus(labSistema.getUniStCodigo().getUniStCodigo(), SqlStatic.NOVACOLETA, "DEFAULT");
-
-                if (listRetornoStatus != null) {
-
-                    RepassarResultadoService service = new RepassarResultadoService();
-                    RepassarResultadoServiceSoap port = service.getRepassarResultadoServiceSoap();
-
-                    for (RetornoStatus retornoStatus : listRetornoStatus) {
-                        try {
-                            port.repassarResultado(retornoStatus.getUpdStCodigo(), retornoStatus.getReqStCodigoAlt(), "NC", retornoStatus.getEdpStCodigo(), "", retornoStatus.getReqStCodigo(), "");
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-
+                if (!retornoStatus.getTipoRetorno().equals("PL")) {
+                    try {
+                        port.repassarResultado(retornoStatus.getUpdStCodigo(), retornoStatus.getReqStCodigoAlt(), retornoStatus.getTipoRetorno(), retornoStatus.getEdpStCodigo(), "", retornoStatus.getReqStCodigo(), laudo);
+                    } catch (Exception ex) {
+                        retornoStatus.setSucesso(false);
+                        ex.printStackTrace();
                     }
                 }
-
-                System.out.println("Lista de Sistemas/Unidade  - Cancelamento: " + labSistema.getSisStCodigo() + "/" + labSistema.getUniStCodigo().getUniStCodigo());
-                listRetornoStatus = EcosistemasSqlDao.grabRegistosStatus(labSistema.getUniStCodigo().getUniStCodigo(), SqlStatic.CANCELAMENTO, "DEFAULT");
-
-                if (listRetornoStatus != null) {
-
-                    RepassarResultadoService service = new RepassarResultadoService();
-                    RepassarResultadoServiceSoap port = service.getRepassarResultadoServiceSoap();
-
-                    for (RetornoStatus retornoStatus : listRetornoStatus) {
-                        try {
-                            port.repassarResultado(retornoStatus.getUpdStCodigo(), retornoStatus.getReqStCodigoAlt(), "CA", retornoStatus.getEdpStCodigo(), "", retornoStatus.getReqStCodigo(), "");
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-
-                    }
-                }
-
-                System.out.println("Lista de Sistemas/Unidade  - Cancelamento: " + labSistema.getSisStCodigo() + "/" + labSistema.getUniStCodigo().getUniStCodigo());
-                listRetornoStatus = EcosistemasSqlDao.grabRegistosStatus(labSistema.getUniStCodigo().getUniStCodigo(), SqlStatic.RESULTADO, "DEFAULT");
-
-                if (listRetornoStatus != null) {
-
-                    RepassarResultadoService service = new RepassarResultadoService();
-                    RepassarResultadoServiceSoap port = service.getRepassarResultadoServiceSoap();
-
-                    for (RetornoStatus retornoStatus : listRetornoStatus) {
-                        try {
-                            
-                            if(retornoStatus.getDerInFlag().intValue() > 1){
-                                port.repassarResultado(retornoStatus.getUpdStCodigo(), retornoStatus.getReqStCodigoAlt(), "LA", retornoStatus.getEdpStCodigo(), "", retornoStatus.getReqStCodigo(), 
-                                        "http://tmlab11.dasa.com.br/cgi/tmlabcgi.exe?req="+retornoStatus.getReqStCodigo()+"&senha="+criaSenha(retornoStatus.getReqStCodigo()));
-                            } else{
-                                port.repassarResultado(retornoStatus.getUpdStCodigo(), retornoStatus.getReqStCodigoAlt(), "AL", retornoStatus.getEdpStCodigo(), "", retornoStatus.getReqStCodigo(),
-                                        "http://tmlab11.dasa.com.br/cgi/tmlabcgi.exe?req="+retornoStatus.getReqStCodigo()+"&senha="+criaSenha(retornoStatus.getReqStCodigo()));
-                            }
-                            
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-
-                    }
-                }
+                EcosistemasSqlDao.updateEnviados(retornoStatus);
             }
         }
-
-        List<RetornoStatus> listRetornoStatus = new ArrayList<RetornoStatus>();
     }
 
     public String criaSenha(String reqStCodigo) {
@@ -124,6 +91,5 @@ public class EcoSistemas {
         Integer total = i + s;
         return total.toString();
     }
-    
 }
 

@@ -37,15 +37,92 @@ public class EcoSistemas {
                         try {
                             port.repassarResultado(retornoStatus.getUpdStCodigo(), retornoStatus.getReqStCodigoAlt(), "EA", retornoStatus.getEdpStCodigo(), "", retornoStatus.getReqStCodigo(), "");
                         } catch (Exception ex) {
+                            ex.printStackTrace();
                         }
 
                     }
                 }
 
+                System.out.println("Lista de Sistemas/Unidade  - Nova Coleta: " + labSistema.getSisStCodigo() + "/" + labSistema.getUniStCodigo().getUniStCodigo());
+                listRetornoStatus = EcosistemasSqlDao.grabRegistosStatus(labSistema.getUniStCodigo().getUniStCodigo(), SqlStatic.NOVACOLETA, "DEFAULT");
+
+                if (listRetornoStatus != null) {
+
+                    RepassarResultadoService service = new RepassarResultadoService();
+                    RepassarResultadoServiceSoap port = service.getRepassarResultadoServiceSoap();
+
+                    for (RetornoStatus retornoStatus : listRetornoStatus) {
+                        try {
+                            port.repassarResultado(retornoStatus.getUpdStCodigo(), retornoStatus.getReqStCodigoAlt(), "NC", retornoStatus.getEdpStCodigo(), "", retornoStatus.getReqStCodigo(), "");
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+
+                    }
+                }
+
+                System.out.println("Lista de Sistemas/Unidade  - Cancelamento: " + labSistema.getSisStCodigo() + "/" + labSistema.getUniStCodigo().getUniStCodigo());
+                listRetornoStatus = EcosistemasSqlDao.grabRegistosStatus(labSistema.getUniStCodigo().getUniStCodigo(), SqlStatic.CANCELAMENTO, "DEFAULT");
+
+                if (listRetornoStatus != null) {
+
+                    RepassarResultadoService service = new RepassarResultadoService();
+                    RepassarResultadoServiceSoap port = service.getRepassarResultadoServiceSoap();
+
+                    for (RetornoStatus retornoStatus : listRetornoStatus) {
+                        try {
+                            port.repassarResultado(retornoStatus.getUpdStCodigo(), retornoStatus.getReqStCodigoAlt(), "CA", retornoStatus.getEdpStCodigo(), "", retornoStatus.getReqStCodigo(), "");
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+
+                    }
+                }
+
+                System.out.println("Lista de Sistemas/Unidade  - Cancelamento: " + labSistema.getSisStCodigo() + "/" + labSistema.getUniStCodigo().getUniStCodigo());
+                listRetornoStatus = EcosistemasSqlDao.grabRegistosStatus(labSistema.getUniStCodigo().getUniStCodigo(), SqlStatic.RESULTADO, "DEFAULT");
+
+                if (listRetornoStatus != null) {
+
+                    RepassarResultadoService service = new RepassarResultadoService();
+                    RepassarResultadoServiceSoap port = service.getRepassarResultadoServiceSoap();
+
+                    for (RetornoStatus retornoStatus : listRetornoStatus) {
+                        try {
+                            
+                            if(retornoStatus.getDerInFlag().intValue() > 1){
+                                port.repassarResultado(retornoStatus.getUpdStCodigo(), retornoStatus.getReqStCodigoAlt(), "LA", retornoStatus.getEdpStCodigo(), "", retornoStatus.getReqStCodigo(), 
+                                        "http://tmlab11.dasa.com.br/cgi/tmlabcgi.exe?req="+retornoStatus.getReqStCodigo()+"&senha="+criaSenha(retornoStatus.getReqStCodigo()));
+                            } else{
+                                port.repassarResultado(retornoStatus.getUpdStCodigo(), retornoStatus.getReqStCodigoAlt(), "AL", retornoStatus.getEdpStCodigo(), "", retornoStatus.getReqStCodigo(),
+                                        "http://tmlab11.dasa.com.br/cgi/tmlabcgi.exe?req="+retornoStatus.getReqStCodigo()+"&senha="+criaSenha(retornoStatus.getReqStCodigo()));
+                            }
+                            
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+
+                    }
+                }
             }
         }
 
         List<RetornoStatus> listRetornoStatus = new ArrayList<RetornoStatus>();
+    }
+
+    public String criaSenha(String reqStCodigo) {
+        
+        String inverte = reqStCodigo.substring(4, 5);
+        inverte = inverte + reqStCodigo.substring(3, 4);
+        inverte = inverte + reqStCodigo.substring(2, 3);
+        inverte = inverte + reqStCodigo.substring(1, 2);
+        inverte = inverte + reqStCodigo.substring(0, 1);
+        
+        Integer i = new Integer(inverte);
+        Integer s = new Integer(reqStCodigo.substring(5,10));
+        
+        Integer total = i + s;
+        return total.toString();
     }
     
 }

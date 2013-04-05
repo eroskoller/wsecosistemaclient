@@ -72,6 +72,7 @@ public class EcoSistemas {
                         ex.printStackTrace();
                     }
                 }
+                
                 EcosistemasSqlDao.updateEnviados(retornoStatus);
             }
         }
